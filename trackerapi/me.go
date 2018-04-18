@@ -20,15 +20,24 @@ var (
 )
 
 func Me() {
-	setCredentials()
 	parse(makeRequest())
-	ioutil.WriteFile(FileLocation, []byte(currentUser.APIToken), 0644)
+	ioutil.WriteFile(FileLocation, []byte(currentUser.APIToken), 0644) //writes returned API token to .tracker file
 }
 
 func makeRequest() []byte {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", URL, nil)
-	req.SetBasicAuth(currentUser.Username, currentUser.Password)
+
+	content, readerr := ioutil.ReadFile(FileLocation)
+	if readerr != nil {
+		//fmt.Printf("Unable to read API tracker token file. Using BasicAuth.")
+		setCredentials()
+		req.SetBasicAuth(currentUser.Username, currentUser.Password)
+	} else {
+		token := string(content)
+		//fmt.Printf("API token detected - %s. Adding request header.", token)
+		req.Header.Add("X-TrackerToken", token)
+	}
 	resp, err := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
