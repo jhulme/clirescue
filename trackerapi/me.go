@@ -34,7 +34,7 @@ func makeRequest() []byte {
 		setCredentials()
 		req.SetBasicAuth(currentUser.Username, currentUser.Password)
 	} else {
-		token := string(content)
+		token := string(content) //what is the expiration time on the API token. Can we check this?
 		//fmt.Printf("API token detected - %s. Adding request header.", token)
 		req.Header.Add("X-TrackerToken", token)
 	}
@@ -63,7 +63,7 @@ func setCredentials() {
 	cmdutil.Silence()
 	fmt.Fprint(Stdout, "Password: ")
 
-	var password = cmdutil.ReadLine()
+	var password = cmdutil.ReadLine() //can we ***** out this line so that password is not readable on screen during entry
 	currentUser.Login(username, password)
 	cmdutil.Unsilence()
 }
